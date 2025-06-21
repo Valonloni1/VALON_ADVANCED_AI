@@ -1,7 +1,7 @@
 import MetaTrader5 as mt5
 
 class MT5Connector:
-    TIMEFRAME_M15 = mt5.TIMEFRAME_M15
+    TIMEFRAME_M15 = mt5.TIMEFRAME_M15  # Konstantat për timeframe mund t'i shtosh edhe të tjera
 
     def __init__(self, login, password, server):
         self.login = login
@@ -16,6 +16,7 @@ class MT5Connector:
         authorized = mt5.login(self.login, self.password, self.server)
         if not authorized:
             print(f"❌ Dështoi login në MT5: {mt5.last_error()}")
+            mt5.shutdown()
             return False
         self.connected = True
         print("✅ MT5 connection established")
@@ -33,6 +34,7 @@ class MT5Connector:
     def send_order(self, symbol, lot, order_type, price, sl, tp):
         print(f"🔁 Simulating order for {symbol} with lot={lot}, SL={sl}, TP={tp}")
         # Këtu duhet të shtosh kodin real për dërgimin e urdhrit në MT5
+        # Shembull i thjeshtë i dërgimit të urdhrit mund të bëhet me mt5.order_send(...)
 
     def shutdown(self):
         mt5.shutdown()

@@ -7,7 +7,8 @@ class ICTStrategy:
         self.ema_period = ema_period
 
     def generate_signal(self, data):
-        if not data or len(data) < self.ema_period:
+        if data is None or len(data) < self.ema_period:
+
             print("⚠️ Të dhënat janë të pamjaftueshme për ICT analizë.")
             return None
 
