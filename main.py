@@ -1,49 +1,40 @@
-# main.py
-
 from connector.mt5_connector import MT5Connector
 from strategies.smc_strategy import SMCStrategy
 from risk.risk_manager import RiskManager
-from tools.utils import log_message
 
 def main():
-    log_message("🚀 Nisja e robotit VALON_ADVANCED_AI...")
+    print("🚀 Nisja e robotit VALON_ADVANCED_AI...")
 
-    # 1. Lidhja me MetaTrader 5
-    mt5 = MT5Connector()
-    if not mt5.connect():
-        log_message("❌ Dështoi lidhja me MT5", level="error")
+    # 1️⃣ Lidhja me MT5
+    connector = MT5Connector()
+    if not connector.connect():
+        print("❌ Dështoi lidhja me MT5.")
         return
 
-    # 2. Inicializimi i strategjisë
-    strategy = SMCStrategy(symbol="XAUUSD", timeframe="M15")
+    print("✅ Lidhja me MT5 u realizua me sukses.")
 
-    # 3. Inicializimi i risk manager-it
-    risk_manager = RiskManager(capital=1000, risk_per_trade=1.5)
+    # 2️⃣ Ngarko strategjinë
+    strategy = SMCStrategy()
 
-    # 4. Marrja e të dhënave historike
-    candles = mt5.get_candles("XAUUSD", "M15", 100)
-    if not candles:
-        log_message("❌ Nuk u morën të dhënat historike.", level="error")
-        return
+    # 3️⃣ Ngarko risk manager
+    risk_manager = RiskManager()
 
-    # 5. Analiza e strategjisë
-    signal = strategy.check_signal(candles)
+    # 4️⃣ Merr të dhënat dhe ekzekuto strategjinë
+    data = connector.get_market_data("XAUUSD", timeframe="M15", count=200)
 
-    # 6. Kontrolli i sinjalit
-    if signal:
-        lot_size, sl_points = risk_manager.calculate_risk(candles)
-        log_message(f"✅ Sinjal gati për tregti: {signal}, lot size: {lot_size}, SL: {sl_points}")
+    if data is not None:
+        signal = strategy.generate_signal(data)
 
-        if mt5.can_trade():
-            mt5.execute_trade(symbol="XAUUSD", signal=signal, lot_size=lot_size, sl_points=sl_points)
+        if signal:
+            lot_size, sl, tp = risk_manager.calculate_position(signal)
+            connector.execute_trade(signal, lot_size, sl, tp)
         else:
-            log_message("⚠️ Llogaria nuk është gati për tregti.", level="warning")
+            print("📉 Asnjë sinjal i vlefshëm për tregti.")
     else:
-        log_message("ℹ️ Asnjë sinjal tregtie për momentin.")
+        print("⚠️ Nuk u morën të dhëna nga MT5.")
 
-    # 7. Mbyllja e sesionit
-    mt5.shutdown()
-    log_message("🧠 Roboti përfundoi sesionin.")
+    # 5️⃣ Shkëput lidhjen
+    connector.shutdown()
 
 if __name__ == "__main__":
     main()
