@@ -1,64 +1,62 @@
-
-# Byte-compiled / optimized / DLL files
+# === Python cache files ===
 __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
+# === Environment files ===
+.env
+.venv/
+venv/
+ENV/
+env.bak/
+*.env
+
+# === Logs and runtime files ===
+*.log
+logs/
+*.pid
+
+# === IDE / Editor settings ===
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# === Compiled files ===
 *.so
+*.dll
+*.dylib
+*.pyd
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
-*.egg
+# === Jupyter Notebooks and IPython ===
+.ipynb_checkpoints
 
-# Installer logs
+# === Data folders ===
+data/
+*.csv
+*.xlsx
+*.xls
+*.json
+*.zip
+*.bak
+
+# === MT5 Specific or API temp files ===
+*.ex5
+*.ex4
+*.mq5
+*.mq4
+
+# === System files ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Python virtualenv ===
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-test-results/
-
-# PyBuilder
-target/
-
-# VS Code
-.vscode/
-
-# Logs and data
-logs/
-data/
-*.log
-
-# Jupyter Notebook
-.ipynb_checkpoints/
-
-# Environment
-.env
-.venv
-ENV/
-env/
-venv/
+# === Output folders ===
+__output__/
+build/
+dist/
+*.egg-info/
