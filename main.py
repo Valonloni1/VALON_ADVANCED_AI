@@ -1,40 +1,40 @@
 from connector.mt5_connector import MT5Connector
-from strategies.smc_strategy import SMCStrategy
+from strategies.ict_smc import CombinedStrategy
 from risk.risk_manager import RiskManager
+from config import LOGIN, PASSWORD, SERVER
+import time
 
-def main():
+if __name__ == "__main__":
     print("🚀 Nisja e robotit VALON_ADVANCED_AI...")
 
     # 1️⃣ Lidhja me MT5
-    connector = MT5Connector()
-    if not connector.connect():
-        print("❌ Dështoi lidhja me MT5.")
-        return
+    mt5 = MT5Connector(LOGIN, PASSWORD, SERVER)
+    mt5.connect()
 
-    print("✅ Lidhja me MT5 u realizua me sukses.")
+    # 2️⃣ Inicializimi i strategjisë dhe risk managerit
+    strategy = CombinedStrategy()
+    risk = RiskManager()
 
-    # 2️⃣ Ngarko strategjinë
-    strategy = SMCStrategy()
+    # 3️⃣ Loop tregtar
+    try:
+        while True:
+            data = mt5.get_data("XAUUSD", timeframe=mt5.TIMEFRAME_M15, bars=50)
+            signal = strategy.generate_signal(data)
 
-    # 3️⃣ Ngarko risk manager
-    risk_manager = RiskManager()
+            if signal:
+                lot = risk.calculate_lot(balance=1000, risk_percent=1.5, stop_loss_pips=50)
+                signal['lot'] = lot
+                mt5.send_order(
+                    symbol=signal['symbol'],
+                    lot=signal['lot'],
+                    order_type=signal['type'],
+                    price=signal['price'],
+                    sl=0,
+                    tp=0
+                )
 
-    # 4️⃣ Merr të dhënat dhe ekzekuto strategjinë
-    data = connector.get_market_data("XAUUSD", timeframe="M15", count=200)
-
-    if data is not None:
-        signal = strategy.generate_signal(data)
-
-        if signal:
-            lot_size, sl, tp = risk_manager.calculate_position(signal)
-            connector.execute_trade(signal, lot_size, sl, tp)
-        else:
-            print("📉 Asnjë sinjal i vlefshëm për tregti.")
-    else:
-        print("⚠️ Nuk u morën të dhëna nga MT5.")
-
-    # 5️⃣ Shkëput lidhjen
-    connector.shutdown()
-
-if __name__ == "__main__":
-    main()
+            time.sleep(60)
+    except KeyboardInterrupt:
+        print("🛑 Ndaluar me sukses nga përdoruesi.")
+    finally:
+        mt5.shutdown()
